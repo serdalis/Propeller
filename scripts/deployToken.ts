@@ -5,17 +5,23 @@
 // Runtime Environment's members available in the global scope.
 import { parseUnits } from "@ethersproject/units";
 import { ethers } from "hardhat";
+import { LedgerSigner } from "@ethersproject/hardware-wallets";    
 
 async function main() {
-  const initialSupply = parseUnits("500000000", "ether");
-  const deployer = await ethers.getSigner("0x1081fF8Bcb85C97Cb7Fa3EAc391642f5ED0248A3");
 
-  console.log("Deploying contracts with the account:", deployer.address);
-  console.log("Account balance:", (await deployer.getBalance()).toString());
-  console.log("Current Gas Price:", (await deployer.getGasPrice()).toString());
+
+  const initialSupply = parseUnits("500000000", "ether");
+  const deployer = await ethers.getSigner("0xb4aDb85f25618523A828AfB2133eb9582B716064");
   
-  const Propeller = await ethers.getContractFactory("PropToken", deployer);
-  const propeller = await Propeller.deploy("Propeller", "PROP", initialSupply, deployer.address);
+  const Propeller = await ethers.getContractFactory("Propeller", deployer);
+  const ledger = await new LedgerSigner(Propeller.signer.provider, "hid", "m/44'/1'/0'/0");                                                                                                                              
+  const PropellerHardware = await Propeller.connect(ledger)
+  
+  console.log("Deploying contracts with the account:", await Propeller.signer.getAddress());
+  console.log("Account balance:", (await Propeller.signer.getBalance()).toString());
+  console.log("Current Gas Price:", (await Propeller.signer.getGasPrice()).toString());
+
+  const propeller = await PropellerHardware.deploy("Propeller", "PROP", initialSupply, Propeller.signer.getAddress());
 
   await propeller.deployed();
 
