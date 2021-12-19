@@ -23,11 +23,17 @@ const config: HardhatUserConfig = {
     }
   },
   networks: {
-    ropsten: {
+    ropstenTest: {
       url: "https://ropsten.infura.io/v3/e5b47f569e574df98f61e9554ba769c3",
       accounts: { mnemonic: process.env.PRIVATE_KEY, path: "m/44'/1'/0'/0", initialIndex: 4, count: 1 },
       gas: 2000000,
-      gasPrice: 2500000008,
+      gasPrice: 1548489962,
+      blockGasLimit: 8000000
+    },
+    ropsten: {
+      url: "https://ropsten.infura.io/v3/e5b47f569e574df98f61e9554ba769c3",
+      gas: 2000000,
+      gasPrice: 1548489962,
       blockGasLimit: 8000000
     },
   },
