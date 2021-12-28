@@ -40,7 +40,6 @@ describe("Crowdsale contract", async function () {
 
         const blockNumBefore = await ethers.provider.getBlockNumber();
         const blockBefore = await ethers.provider.getBlock(blockNumBefore);
-        const timestampBefore = blockBefore.timestamp;
 
         // To deploy our contract, we just have to call Token.deploy() and await
         // for it to be deployed(), which happens once its transaction has been
@@ -49,8 +48,7 @@ describe("Crowdsale contract", async function () {
             rate,
             owner.address,
             propeller.address,
-            timestampBefore + 1,
-            timestampBefore + 100) as PropellerCrowdsale;
+            100) as PropellerCrowdsale;
     });
 
     describe("Token Buying", function () {
@@ -128,21 +126,6 @@ describe("Crowdsale timed contract", async function () {
     });
 
     describe("Token Buying", function () {
-        it("Should deny buys before start", async function () {
-            const currentTime = await getCurrentBlockTime();
-
-            propellerCrowdsale = await PropellerCrowdsaleFactory.deploy(
-                rate,
-                owner.address,
-                propeller.address,
-                currentTime + 5,
-                currentTime + 10) as PropellerCrowdsale;
-
-            await expect(
-                propellerCrowdsale.connect(addr2).buyTokens(addr2.address, {value: testEtherValue})
-            ).to.be.revertedWith("Crowdsale: not open");
-        });
-
         it("Should deny buys after end", async function () {
             const currentTime = await getCurrentBlockTime();
 
@@ -150,8 +133,7 @@ describe("Crowdsale timed contract", async function () {
                 rate,
                 owner.address,
                 propeller.address,
-                currentTime + 1,
-                currentTime + 2) as PropellerCrowdsale;
+                1) as PropellerCrowdsale;
 
             await sleep(3000);
             await expect(
@@ -166,8 +148,7 @@ describe("Crowdsale timed contract", async function () {
                 rate,
                 owner.address,
                 propeller.address,
-                currentTime + 1,
-                currentTime + 5) as PropellerCrowdsale;
+                5) as PropellerCrowdsale;
 
             await expect(
                 propellerCrowdsale.sendLeftoversToPool()
@@ -181,10 +162,9 @@ describe("Crowdsale timed contract", async function () {
                 rate,
                 owner.address,
                 propeller.address,
-                currentTime + 1,
-                currentTime + 2) as PropellerCrowdsale;
+                1) as PropellerCrowdsale;
 
-            await sleep(3000);
+            await sleep(2000);
 
             await propeller.transfer(propellerCrowdsale.address, crowdsaleCap);
             await propellerCrowdsale.sendLeftoversToPool();
@@ -194,14 +174,11 @@ describe("Crowdsale timed contract", async function () {
         });
 
         it("Should allow buying tokens while open", async function () {
-            const currentTime = await getCurrentBlockTime();
-
             propellerCrowdsale = await PropellerCrowdsaleFactory.deploy(
                 rate,
                 owner.address,
                 propeller.address,
-                currentTime + 1,
-                currentTime + 100) as PropellerCrowdsale;
+                100) as PropellerCrowdsale;
 
             await propeller.transfer(propellerCrowdsale.address, crowdsaleCap);
 

@@ -10,11 +10,10 @@ contract PropellerCrowdsale is Crowdsale, TimedCrowdsale {
     uint256 _rate,
     address payable _wallet,
     Propeller _token,
-    uint256 _openingTime,
-    uint256 _closingTime
+    uint256 _openTime
   )
     Crowdsale(_rate, _wallet, _token)
-    TimedCrowdsale(_openingTime, _closingTime)
+    TimedCrowdsale(_openTime)
   {
     // solhint-disable-previous-line no-empty-blocks 
   }

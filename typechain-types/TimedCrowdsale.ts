@@ -72,21 +72,11 @@ export interface TimedCrowdsaleInterface extends utils.Interface {
   decodeFunctionResult(functionFragment: "weiRaised", data: BytesLike): Result;
 
   events: {
-    "TimedCrowdsaleExtended(uint256,uint256)": EventFragment;
     "TokensPurchased(address,address,uint256,uint256)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "TimedCrowdsaleExtended"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TokensPurchased"): EventFragment;
 }
-
-export type TimedCrowdsaleExtendedEvent = TypedEvent<
-  [BigNumber, BigNumber],
-  { prevClosingTime: BigNumber; newClosingTime: BigNumber }
->;
-
-export type TimedCrowdsaleExtendedEventFilter =
-  TypedEventFilter<TimedCrowdsaleExtendedEvent>;
 
 export type TokensPurchasedEvent = TypedEvent<
   [string, string, BigNumber, BigNumber],
@@ -201,15 +191,6 @@ export interface TimedCrowdsale extends BaseContract {
   };
 
   filters: {
-    "TimedCrowdsaleExtended(uint256,uint256)"(
-      prevClosingTime?: null,
-      newClosingTime?: null
-    ): TimedCrowdsaleExtendedEventFilter;
-    TimedCrowdsaleExtended(
-      prevClosingTime?: null,
-      newClosingTime?: null
-    ): TimedCrowdsaleExtendedEventFilter;
-
     "TokensPurchased(address,address,uint256,uint256)"(
       purchaser?: string | null,
       beneficiary?: string | null,

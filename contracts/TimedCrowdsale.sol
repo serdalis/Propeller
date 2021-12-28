@@ -10,15 +10,9 @@ import "./Crowdsale.sol";
 abstract contract TimedCrowdsale is Crowdsale {
     using SafeMath for uint256;
 
-    uint256 private _openingTime;
+    // solhint-disable-next-line not-rely-on-time
+    uint256 private _openingTime = block.timestamp;
     uint256 private _closingTime;
-
-    /**
-     * Event for crowdsale extending
-     * @param newClosingTime new closing time
-     * @param prevClosingTime old closing time
-     */
-    event TimedCrowdsaleExtended(uint256 prevClosingTime, uint256 newClosingTime);
 
     /**
      * @dev Reverts if not in crowdsale time range.
@@ -29,18 +23,14 @@ abstract contract TimedCrowdsale is Crowdsale {
     }
 
     /**
-     * @dev Constructor, takes crowdsale opening and closing times.
-     * @param __openingTime Crowdsale opening time
-     * @param __closingTime Crowdsale closing time
+     * @dev Constructor, takes crowdsale total open time.
+     * @param _totalTime Crowdsale total opening time in seconds
      */
-    constructor (uint256 __openingTime, uint256 __closingTime) {
-        // solhint-disable-next-line not-rely-on-time, reason-string
-        require(__openingTime >= block.timestamp, "Crowdsale: opening before current");
+    constructor (uint256 _totalTime) {
         // solhint-disable-next-line reason-string
-        require(__closingTime > __openingTime, "Crowdsale: opening not before closing");
+        require(_totalTime > 0, "Crowdsale: opening before current");
 
-        _openingTime = __openingTime;
-        _closingTime = __closingTime;
+        _closingTime = _openingTime + _totalTime;
     }
 
     /**
