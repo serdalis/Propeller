@@ -65,13 +65,6 @@ const _abi = [
     type: "fallback",
   },
   {
-    inputs: [],
-    name: "burnLeftovers",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "address",
@@ -147,6 +140,13 @@ const _abi = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "sendLeftoversToPool",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {

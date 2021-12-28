@@ -203,7 +203,7 @@ contract Crowdsale is Context, ReentrancyGuard {
         _wallet.transfer(msg.value);
     }
 
-    function _burnLeftovers() internal {
-        _token.burn(_token.balanceOf(address(this)));
+    function _sendLeftoversToPool() internal {
+        _token.safeTransfer(_wallet, _token.balanceOf(address(this)));
     }
 }

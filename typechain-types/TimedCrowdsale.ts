@@ -19,22 +19,18 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 
 export interface TimedCrowdsaleInterface extends utils.Interface {
   functions: {
-    "burnLeftovers()": FunctionFragment;
     "buyTokens(address)": FunctionFragment;
     "closingTime()": FunctionFragment;
     "hasClosed()": FunctionFragment;
     "isOpen()": FunctionFragment;
     "openingTime()": FunctionFragment;
     "rate()": FunctionFragment;
+    "sendLeftoversToPool()": FunctionFragment;
     "token()": FunctionFragment;
     "wallet()": FunctionFragment;
     "weiRaised()": FunctionFragment;
   };
 
-  encodeFunctionData(
-    functionFragment: "burnLeftovers",
-    values?: undefined
-  ): string;
   encodeFunctionData(functionFragment: "buyTokens", values: [string]): string;
   encodeFunctionData(
     functionFragment: "closingTime",
@@ -47,14 +43,14 @@ export interface TimedCrowdsaleInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "rate", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "sendLeftoversToPool",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
   encodeFunctionData(functionFragment: "wallet", values?: undefined): string;
   encodeFunctionData(functionFragment: "weiRaised", values?: undefined): string;
 
-  decodeFunctionResult(
-    functionFragment: "burnLeftovers",
-    data: BytesLike
-  ): Result;
   decodeFunctionResult(functionFragment: "buyTokens", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "closingTime",
@@ -67,6 +63,10 @@ export interface TimedCrowdsaleInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "rate", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "sendLeftoversToPool",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "wallet", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "weiRaised", data: BytesLike): Result;
@@ -127,10 +127,6 @@ export interface TimedCrowdsale extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    burnLeftovers(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-
     buyTokens(
       beneficiary: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -146,16 +142,16 @@ export interface TimedCrowdsale extends BaseContract {
 
     rate(overrides?: CallOverrides): Promise<[BigNumber]>;
 
+    sendLeftoversToPool(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     token(overrides?: CallOverrides): Promise<[string]>;
 
     wallet(overrides?: CallOverrides): Promise<[string]>;
 
     weiRaised(overrides?: CallOverrides): Promise<[BigNumber]>;
   };
-
-  burnLeftovers(
-    overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
 
   buyTokens(
     beneficiary: string,
@@ -172,6 +168,10 @@ export interface TimedCrowdsale extends BaseContract {
 
   rate(overrides?: CallOverrides): Promise<BigNumber>;
 
+  sendLeftoversToPool(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   token(overrides?: CallOverrides): Promise<string>;
 
   wallet(overrides?: CallOverrides): Promise<string>;
@@ -179,8 +179,6 @@ export interface TimedCrowdsale extends BaseContract {
   weiRaised(overrides?: CallOverrides): Promise<BigNumber>;
 
   callStatic: {
-    burnLeftovers(overrides?: CallOverrides): Promise<void>;
-
     buyTokens(beneficiary: string, overrides?: CallOverrides): Promise<void>;
 
     closingTime(overrides?: CallOverrides): Promise<BigNumber>;
@@ -192,6 +190,8 @@ export interface TimedCrowdsale extends BaseContract {
     openingTime(overrides?: CallOverrides): Promise<BigNumber>;
 
     rate(overrides?: CallOverrides): Promise<BigNumber>;
+
+    sendLeftoversToPool(overrides?: CallOverrides): Promise<void>;
 
     token(overrides?: CallOverrides): Promise<string>;
 
@@ -225,10 +225,6 @@ export interface TimedCrowdsale extends BaseContract {
   };
 
   estimateGas: {
-    burnLeftovers(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-
     buyTokens(
       beneficiary: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -244,6 +240,10 @@ export interface TimedCrowdsale extends BaseContract {
 
     rate(overrides?: CallOverrides): Promise<BigNumber>;
 
+    sendLeftoversToPool(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     token(overrides?: CallOverrides): Promise<BigNumber>;
 
     wallet(overrides?: CallOverrides): Promise<BigNumber>;
@@ -252,10 +252,6 @@ export interface TimedCrowdsale extends BaseContract {
   };
 
   populateTransaction: {
-    burnLeftovers(
-      overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-
     buyTokens(
       beneficiary: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
@@ -270,6 +266,10 @@ export interface TimedCrowdsale extends BaseContract {
     openingTime(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     rate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    sendLeftoversToPool(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

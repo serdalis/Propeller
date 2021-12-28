@@ -16,9 +16,6 @@ describe("Crowdsale contract", async function () {
     const initialSupply = parseUnits("500000000", "ether");
     const crowdsaleCap = parseUnits("500000", "ether");
 
-    const name = 'Propeller';
-    const symbol = 'PROP';
-
     let PropellerCrowdsaleFactory;
     let propeller: Propeller;
     let propellerCrowdsale: PropellerCrowdsale;
@@ -29,13 +26,13 @@ describe("Crowdsale contract", async function () {
 
     beforeEach(async function () {
         // Get the ContractFactory and Signers here.
-        const propellerFactory = await ethers.getContractFactory(name);
+        const PropellerFactory = await ethers.getContractFactory('Propeller');
         [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
 
         // To deploy our contract, we just have to call Token.deploy() and await
         // for it to be deployed(), which happens once its transaction has been
         // mined.
-        propeller = await propellerFactory.deploy(name, symbol, initialSupply, owner.address) as Propeller;
+        propeller = await PropellerFactory.deploy('Propeller', 'ProP', initialSupply, owner.address) as Propeller;
 
         // Get the ContractFactory and Signers here.
         PropellerCrowdsaleFactory = await ethers.getContractFactory('PropellerCrowdsale', owner);
@@ -101,7 +98,7 @@ describe("Crowdsale timed contract", async function () {
 
     const testEtherValue = parseUnits("0.5", "ether");
 
-    let propellerCrowdsaleFactory: ContractFactory;
+    let PropellerCrowdsaleFactory: ContractFactory;
     let propeller: Propeller;
     let propellerCrowdsale: PropellerCrowdsale;
     let owner: SignerWithAddress;
@@ -117,16 +114,16 @@ describe("Crowdsale timed contract", async function () {
 
     beforeEach(async function () {
         // Get the ContractFactory and Signers here.
-        const propellerFactory = await ethers.getContractFactory('Propeller');
+        const PropellerFactory = await ethers.getContractFactory('Propeller');
         [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
 
         // To deploy our contract, we just have to call Token.deploy() and await
         // for it to be deployed(), which happens once its transaction has been
         // mined.
-        propeller = await propellerFactory.deploy('Propeller', 'ProP', initialSupply, owner.address) as Propeller;
+        propeller = await PropellerFactory.deploy('Propeller', 'ProP', initialSupply, owner.address) as Propeller;
 
         // Get the ContractFactory and Signers here.
-        propellerCrowdsaleFactory = await ethers.getContractFactory('PropellerCrowdsale', owner) as ContractFactory;
+        PropellerCrowdsaleFactory = await ethers.getContractFactory('PropellerCrowdsale', owner) as ContractFactory;
         [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
     });
 
@@ -134,7 +131,7 @@ describe("Crowdsale timed contract", async function () {
         it("Should deny buys before start", async function () {
             const currentTime = await getCurrentBlockTime();
 
-            propellerCrowdsale = await propellerCrowdsaleFactory.deploy(
+            propellerCrowdsale = await PropellerCrowdsaleFactory.deploy(
                 rate,
                 owner.address,
                 propeller.address,
@@ -149,7 +146,7 @@ describe("Crowdsale timed contract", async function () {
         it("Should deny buys after end", async function () {
             const currentTime = await getCurrentBlockTime();
 
-            propellerCrowdsale = await propellerCrowdsaleFactory.deploy(
+            propellerCrowdsale = await PropellerCrowdsaleFactory.deploy(
                 rate,
                 owner.address,
                 propeller.address,
@@ -162,10 +159,10 @@ describe("Crowdsale timed contract", async function () {
             ).to.be.revertedWith("Crowdsale: not open");
         });
 
-        it("Should not burn when sale not ended", async function () {
+        it("Should not send to pool when sale not ended", async function () {
             const currentTime = await getCurrentBlockTime();
 
-            propellerCrowdsale = await propellerCrowdsaleFactory.deploy(
+            propellerCrowdsale = await PropellerCrowdsaleFactory.deploy(
                 rate,
                 owner.address,
                 propeller.address,
@@ -173,14 +170,14 @@ describe("Crowdsale timed contract", async function () {
                 currentTime + 5) as PropellerCrowdsale;
 
             await expect(
-                propellerCrowdsale.burnLeftovers()
-            ).to.be.revertedWith("Crowdsale: Can't burn before sale end");
+                propellerCrowdsale.sendLeftoversToPool()
+            ).to.be.revertedWith("Crowdsale: Can't send before sale end");
         });
 
-        it("Should burn when sale ended", async function () {
+        it("Should send to pool when sale ended", async function () {
             const currentTime = await getCurrentBlockTime();
 
-            propellerCrowdsale = await propellerCrowdsaleFactory.deploy(
+            propellerCrowdsale = await PropellerCrowdsaleFactory.deploy(
                 rate,
                 owner.address,
                 propeller.address,
@@ -190,15 +187,16 @@ describe("Crowdsale timed contract", async function () {
             await sleep(3000);
 
             await propeller.transfer(propellerCrowdsale.address, crowdsaleCap);
-            await propellerCrowdsale.burnLeftovers();
+            await propellerCrowdsale.sendLeftoversToPool();
 
             expect(await propeller.balanceOf(propellerCrowdsale.address)).to.equal(parseUnits("0", "ether"));
+            expect(await propeller.balanceOf(owner.address)).to.equal(initialSupply);
         });
 
         it("Should allow buying tokens while open", async function () {
             const currentTime = await getCurrentBlockTime();
 
-            propellerCrowdsale = await propellerCrowdsaleFactory.deploy(
+            propellerCrowdsale = await PropellerCrowdsaleFactory.deploy(
                 rate,
                 owner.address,
                 propeller.address,

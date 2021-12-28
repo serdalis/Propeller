@@ -83,22 +83,9 @@ abstract contract TimedCrowdsale is Crowdsale {
         super._preValidatePurchase(beneficiary, weiAmount);
     }
 
-    /**
-     * @dev Extend crowdsale.
-     * @param newClosingTime Crowdsale closing time
-     */
-    function _extendTime(uint256 newClosingTime) internal {
-        require(!hasClosed(), "Crowdsale: already closed");
+    function sendLeftoversToPool() public {
         // solhint-disable-next-line reason-string
-        require(newClosingTime > _closingTime, "Crowdsale: new closing before current");
-
-        emit TimedCrowdsaleExtended(_closingTime, newClosingTime);
-        _closingTime = newClosingTime;
-    }
-
-    function burnLeftovers() public {
-        // solhint-disable-next-line reason-string
-        require(hasClosed(), "Crowdsale: Can't burn before sale end");
-        super._burnLeftovers();
+        require(hasClosed(), "Crowdsale: Can't send before sale end");
+        super._sendLeftoversToPool();
     }
 }
