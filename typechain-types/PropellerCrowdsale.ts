@@ -4,6 +4,7 @@
 import {
   BaseContract,
   BigNumber,
+  BigNumberish,
   BytesLike,
   CallOverrides,
   ContractTransaction,
@@ -20,63 +21,85 @@ import { TypedEventFilter, TypedEvent, TypedListener, OnEvent } from "./common";
 export interface PropellerCrowdsaleInterface extends utils.Interface {
   functions: {
     "buyTokens(address)": FunctionFragment;
-    "closingTime()": FunctionFragment;
-    "hasClosed()": FunctionFragment;
-    "isOpen()": FunctionFragment;
-    "openingTime()": FunctionFragment;
+    "changeRate(uint256)": FunctionFragment;
+    "owner()": FunctionFragment;
     "rate()": FunctionFragment;
+    "renounceOwnership()": FunctionFragment;
     "sendLeftoversToPool()": FunctionFragment;
     "token()": FunctionFragment;
+    "transferOwnership(address)": FunctionFragment;
     "wallet()": FunctionFragment;
     "weiRaised()": FunctionFragment;
   };
 
   encodeFunctionData(functionFragment: "buyTokens", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "closingTime",
-    values?: undefined
+    functionFragment: "changeRate",
+    values: [BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "hasClosed", values?: undefined): string;
-  encodeFunctionData(functionFragment: "isOpen", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "openingTime",
-    values?: undefined
-  ): string;
+  encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "rate", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "renounceOwnership",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "sendLeftoversToPool",
     values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "token", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "transferOwnership",
+    values: [string]
+  ): string;
   encodeFunctionData(functionFragment: "wallet", values?: undefined): string;
   encodeFunctionData(functionFragment: "weiRaised", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "buyTokens", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "closingTime",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "hasClosed", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "isOpen", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "openingTime",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "changeRate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "rate", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "renounceOwnership",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "sendLeftoversToPool",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "transferOwnership",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "wallet", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "weiRaised", data: BytesLike): Result;
 
   events: {
+    "OwnershipTransferred(address,address)": EventFragment;
+    "RateChanged(uint256,uint256)": EventFragment;
     "TokensPurchased(address,address,uint256,uint256)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RateChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "TokensPurchased"): EventFragment;
 }
+
+export type OwnershipTransferredEvent = TypedEvent<
+  [string, string],
+  { previousOwner: string; newOwner: string }
+>;
+
+export type OwnershipTransferredEventFilter =
+  TypedEventFilter<OwnershipTransferredEvent>;
+
+export type RateChangedEvent = TypedEvent<
+  [BigNumber, BigNumber],
+  { oldRate: BigNumber; newRate: BigNumber }
+>;
+
+export type RateChangedEventFilter = TypedEventFilter<RateChangedEvent>;
 
 export type TokensPurchasedEvent = TypedEvent<
   [string, string, BigNumber, BigNumber],
@@ -122,21 +145,29 @@ export interface PropellerCrowdsale extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    closingTime(overrides?: CallOverrides): Promise<[BigNumber]>;
+    changeRate(
+      newRate: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
-    hasClosed(overrides?: CallOverrides): Promise<[boolean]>;
-
-    isOpen(overrides?: CallOverrides): Promise<[boolean]>;
-
-    openingTime(overrides?: CallOverrides): Promise<[BigNumber]>;
+    owner(overrides?: CallOverrides): Promise<[string]>;
 
     rate(overrides?: CallOverrides): Promise<[BigNumber]>;
+
+    renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     sendLeftoversToPool(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     token(overrides?: CallOverrides): Promise<[string]>;
+
+    transferOwnership(
+      newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
 
     wallet(overrides?: CallOverrides): Promise<[string]>;
 
@@ -148,21 +179,29 @@ export interface PropellerCrowdsale extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  closingTime(overrides?: CallOverrides): Promise<BigNumber>;
+  changeRate(
+    newRate: BigNumberish,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
-  hasClosed(overrides?: CallOverrides): Promise<boolean>;
-
-  isOpen(overrides?: CallOverrides): Promise<boolean>;
-
-  openingTime(overrides?: CallOverrides): Promise<BigNumber>;
+  owner(overrides?: CallOverrides): Promise<string>;
 
   rate(overrides?: CallOverrides): Promise<BigNumber>;
+
+  renounceOwnership(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   sendLeftoversToPool(
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   token(overrides?: CallOverrides): Promise<string>;
+
+  transferOwnership(
+    newOwner: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
 
   wallet(overrides?: CallOverrides): Promise<string>;
 
@@ -171,19 +210,22 @@ export interface PropellerCrowdsale extends BaseContract {
   callStatic: {
     buyTokens(beneficiary: string, overrides?: CallOverrides): Promise<void>;
 
-    closingTime(overrides?: CallOverrides): Promise<BigNumber>;
+    changeRate(newRate: BigNumberish, overrides?: CallOverrides): Promise<void>;
 
-    hasClosed(overrides?: CallOverrides): Promise<boolean>;
-
-    isOpen(overrides?: CallOverrides): Promise<boolean>;
-
-    openingTime(overrides?: CallOverrides): Promise<BigNumber>;
+    owner(overrides?: CallOverrides): Promise<string>;
 
     rate(overrides?: CallOverrides): Promise<BigNumber>;
+
+    renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     sendLeftoversToPool(overrides?: CallOverrides): Promise<void>;
 
     token(overrides?: CallOverrides): Promise<string>;
+
+    transferOwnership(
+      newOwner: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     wallet(overrides?: CallOverrides): Promise<string>;
 
@@ -191,6 +233,21 @@ export interface PropellerCrowdsale extends BaseContract {
   };
 
   filters: {
+    "OwnershipTransferred(address,address)"(
+      previousOwner?: string | null,
+      newOwner?: string | null
+    ): OwnershipTransferredEventFilter;
+    OwnershipTransferred(
+      previousOwner?: string | null,
+      newOwner?: string | null
+    ): OwnershipTransferredEventFilter;
+
+    "RateChanged(uint256,uint256)"(
+      oldRate?: null,
+      newRate?: null
+    ): RateChangedEventFilter;
+    RateChanged(oldRate?: null, newRate?: null): RateChangedEventFilter;
+
     "TokensPurchased(address,address,uint256,uint256)"(
       purchaser?: string | null,
       beneficiary?: string | null,
@@ -211,21 +268,29 @@ export interface PropellerCrowdsale extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    closingTime(overrides?: CallOverrides): Promise<BigNumber>;
+    changeRate(
+      newRate: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
-    hasClosed(overrides?: CallOverrides): Promise<BigNumber>;
-
-    isOpen(overrides?: CallOverrides): Promise<BigNumber>;
-
-    openingTime(overrides?: CallOverrides): Promise<BigNumber>;
+    owner(overrides?: CallOverrides): Promise<BigNumber>;
 
     rate(overrides?: CallOverrides): Promise<BigNumber>;
+
+    renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     sendLeftoversToPool(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     token(overrides?: CallOverrides): Promise<BigNumber>;
+
+    transferOwnership(
+      newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
 
     wallet(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -238,21 +303,29 @@ export interface PropellerCrowdsale extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    closingTime(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    changeRate(
+      newRate: BigNumberish,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
-    hasClosed(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    isOpen(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    openingTime(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     rate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    renounceOwnership(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     sendLeftoversToPool(
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     token(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    transferOwnership(
+      newOwner: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
 
     wallet(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

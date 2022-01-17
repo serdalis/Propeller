@@ -6,6 +6,7 @@ import "openzeppelin-solidity/contracts/token/ERC20/utils/SafeERC20.sol";
 import "openzeppelin-solidity/contracts/utils/Context.sol";
 import "openzeppelin-solidity/contracts/utils/math/SafeMath.sol";
 import "openzeppelin-solidity/contracts/security/ReentrancyGuard.sol";
+import "openzeppelin-solidity/contracts/access/Ownable.sol";
 
 /**
  * @title Crowdsale
@@ -19,7 +20,7 @@ import "openzeppelin-solidity/contracts/security/ReentrancyGuard.sol";
  * the methods to add functionality. Consider using 'super' where appropriate to concatenate
  * behavior.
  */
-contract Crowdsale is Context, ReentrancyGuard {
+contract Crowdsale is Context, ReentrancyGuard, Ownable {
     using SafeMath for uint256;
     using SafeERC20 for ERC20Burnable;
 
@@ -46,6 +47,12 @@ contract Crowdsale is Context, ReentrancyGuard {
      * @param amount amount of tokens purchased
      */
     event TokensPurchased(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
+
+    /**
+     * @param oldRate The previous PROP / ETH rate.
+     * @param newRate The new PROP / ETH rate.
+     */
+    event RateChanged(uint256 oldRate, uint256 newRate);
 
     /**
      * @param __rate Number of token units a buyer gets per wei
@@ -203,7 +210,21 @@ contract Crowdsale is Context, ReentrancyGuard {
         _wallet.transfer(msg.value);
     }
 
-    function _sendLeftoversToPool() internal {
+    /**
+     * @dev We can add and remove tokens to 'open' and 'close' this crowdsale whenever, instead of multiple timed crowdsales.
+     */
+    function sendLeftoversToPool() public onlyOwner {
         _token.safeTransfer(_wallet, _token.balanceOf(address(this)));
+    }
+
+    /**
+     * @dev Allow us to change how many PROP one ETH is worth for each crowdsale stage.
+     * @param newRate The new amount of PROP 1 ETH will buy.
+     */
+    function changeRate(uint256 newRate) public onlyOwner {
+        uint256 oldRate = _rate;
+        _rate = newRate;
+
+        emit RateChanged(oldRate, _rate);
     }
 }
